@@ -1,19 +1,11 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class ScaleTo : MonoBehaviour
+public class ScaleTo : BaseAction
 {
     [SerializeField] private Vector3 _targetScale;
-    [SerializeField] private float _duration;
-    [SerializeField] private int _repeats;
-    [SerializeField] private LoopType _loopType;
 
-    private void Start()
-    {
-        Scale();
-    }
-
-    private void Scale()
+    protected override void PerformAction()
     {
         transform.DOScale(_targetScale, _duration).SetLoops(_repeats, _loopType);
     }
