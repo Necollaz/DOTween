@@ -1,4 +1,3 @@
-using System.Collections;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,69 +10,53 @@ public class СhangeText : MonoBehaviour
     [SerializeField] private float _duration = 3f;
     [SerializeField] private string[] _message;
 
-    private int _currentIndex = 0;
     private string _initialText = "";
 
     private void Start()
     {
-        if(_text != null && _message.Length > 0)
+        if (_text != null && _message.Length > 0)
         {
             _initialText = _text.text;
-            StartCoroutine(ChangedText());
+            Changed();
         }
     }
 
-    private IEnumerator ChangedText()
+    private void Changed()
     {
-        while (true)
-        {
-            var wait = new WaitForSeconds(_duration);
-            string message = _message[_currentIndex % _message.Length];
-            ChangeMode changeMode = (ChangeMode)(_currentIndex % 3);
+        Sequence sequence = DOTween.Sequence();
 
-            switch(changeMode)
+        for (int i = 0; i < _message.Length; i++)
+        {
+            string message = _message[i];
+            ChangeMode changeMode = (ChangeMode)(i % 3);
+
+            switch (changeMode)
             {
                 case ChangeMode.Replace:
-                    ReplaceText(message);
+                    sequence.Append(_text.DOText(message, _duration));
                     break;
 
                 case ChangeMode.Add:
-                    AddText(message);
+                    sequence.Append(_text.DOText(_text.text + message, _duration));
                     break;
 
                 case ChangeMode.EffectReplace:
-                    EffectReplaceText(message);
+                    sequence.Append(_text.DOText(message, _duration, true, ScrambleMode.All));
+                    sequence.Join(_text.DOColor(Color.red, _duration));
                     break;
             }
 
-            yield return wait;
-            _currentIndex++;
-
-            if (_currentIndex % 3 == 0)
+            if (i % 3 == 2)
             {
-                yield return wait;
-                ResetText();
+                sequence.AppendCallback(Reset);
+                sequence.AppendInterval(_duration);
             }
         }
+
+        sequence.SetLoops(-1);
     }
 
-    private void ReplaceText(string message)
-    {
-        _text.DOText(message, _duration);
-    }
-
-    private void AddText(string message)
-    {
-        _text.DOText(_text.text + message, _duration);
-    }
-
-    private void EffectReplaceText(string message)
-    {
-        _text.DOText(message, _duration, true, ScrambleMode.All);
-        _text.DOColor(Color.red, _duration);
-    }
-
-    private void ResetText()
+    private void Reset()
     {
         _text.text = _initialText;
         _text.color = Color.black;

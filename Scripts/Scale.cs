@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class ScaleTo : BaseAction
+public class Scale : Basic
 {
     [SerializeField] private Vector3 _targetScale;
 

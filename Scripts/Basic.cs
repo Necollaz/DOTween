@@ -1,7 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 
-public abstract class BaseAction : MonoBehaviour
+public abstract class Basic : MonoBehaviour
 {
     [SerializeField] protected float _duration;
     [SerializeField] protected int _repeats;
