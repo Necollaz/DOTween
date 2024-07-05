@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class Rotate : Basic
+public class Rotator : Basic
 {
     [SerializeField] private Vector3 _rotation;
 

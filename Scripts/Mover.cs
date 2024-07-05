@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class Move : Basic
+public class Mover : Basic
 {
     [SerializeField] private Vector3 _position;
 

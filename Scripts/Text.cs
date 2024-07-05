@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class СhangeText : MonoBehaviour
+public class Text : MonoBehaviour
 {
     private enum ChangeMode { Replace, Add, EffectReplace }
 
