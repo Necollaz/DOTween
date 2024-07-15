@@ -9,51 +9,58 @@ public class TextChanger : MonoBehaviour
     [SerializeField] private Text _text;
     [SerializeField] private float _duration = 3f;
     [SerializeField] private string[] _message;
+    [SerializeField] private int _loopInterval = 3;
+    [SerializeField] private int _callbackTrigger = 2;
 
     private string _initialText = "";
+    private delegate void ChangeMethod(string message, TweenCallback onComplete);
 
     private void Start()
     {
         if (_text != null && _message.Length > 0)
         {
             _initialText = _text.text;
-            Changed();
+            Changed(0);
         }
     }
 
-    private void Changed()
+    private void Changed(int index)
     {
-        Sequence sequence = DOTween.Sequence();
-
-        for (int i = 0; i < _message.Length; i++)
+        if (index >= _message.Length)
         {
-            string message = _message[i];
-            ChangeMode changeMode = (ChangeMode)(i % 3);
-
-            switch (changeMode)
-            {
-                case ChangeMode.Replace:
-                    sequence.Append(_text.DOText(message, _duration));
-                    break;
-
-                case ChangeMode.Add:
-                    sequence.Append(_text.DOText(_text.text + message, _duration));
-                    break;
-
-                case ChangeMode.EffectReplace:
-                    sequence.Append(_text.DOText(message, _duration, true, ScrambleMode.All));
-                    sequence.Join(_text.DOColor(Color.red, _duration));
-                    break;
-            }
-
-            if (i % 3 == 2)
-            {
-                sequence.AppendCallback(Reset);
-                sequence.AppendInterval(_duration);
-            }
+            Changed(0);
+            return;
         }
 
-        sequence.SetLoops(-1);
+        string message = _message[index];
+        int modeIndex = index % _loopInterval;
+
+        ChangeMethod[] changeMethods = new ChangeMethod[] { Replace, Add, EffectReplace };
+
+        changeMethods[modeIndex](message, () => {
+            if (index % _loopInterval == _callbackTrigger)
+            {
+                Reset();
+            }
+            Changed(index + 1);
+        });
+
+    }
+
+    private void Replace(string message, TweenCallback onComplete)
+    {
+        _text.DOText(message, _duration).OnComplete(onComplete);
+    }
+
+    private void Add(string message, TweenCallback onComplete)
+    {
+        _text.DOText(_text.text + message, _duration).OnComplete(onComplete);
+    }
+
+    private void EffectReplace(string message, TweenCallback onComplete)
+    {
+        _text.DOText(message, _duration, true, ScrambleMode.All);
+        _text.DOColor(Color.red, _duration).OnComplete(onComplete);
     }
 
     private void Reset()
